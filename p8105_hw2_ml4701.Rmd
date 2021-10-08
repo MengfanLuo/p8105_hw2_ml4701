@@ -6,8 +6,20 @@ output: github_document
 
 ```{r, echo=FALSE,message=FALSE}
 library(tidyverse)
-library(palmerpenguins)
+library(readxl)
 ```
 
 ### Problem 1
+
+Let's load the Mr. Trash Wheel sheet as `mtw_df` and clean it:
+
+```{r}
+mtw_df = 
+  read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+             sheet = "Mr. Trash Wheel",range = "A2:N534") %>% 
+  na.omit() %>% 
+  janitor::clean_names() %>% 
+  mutate(sports_balls = round(sports_balls))
+view(mtw_df)
+```
 
