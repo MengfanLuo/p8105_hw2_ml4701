@@ -17,9 +17,54 @@ Let's load the Mr. Trash Wheel sheet as `mtw_df` and clean it:
 mtw_df = 
   read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
              sheet = "Mr. Trash Wheel",range = "A2:N534") %>% 
-  na.omit() %>% 
+  drop_na() %>% 
   janitor::clean_names() %>% 
-  mutate(sports_balls = round(sports_balls))
-view(mtw_df)
+  mutate(sports_balls = round(sports_balls)) 
+
 ```
 
+Let's take a look at the first and last 3 lines of `mtw_df`.
+
+```{r}
+knitr::kable(head(mtw_df,3))
+knitr::kable(tail(mtw_df,3))
+```
+
+
+Let's load and clean precipitation data for 2018 and 2019, and then combine them into one dataframe `prec_2018_2019_df`.
+
+```{r}
+prec_2018_df = 
+  read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+             sheet = "2018 Precipitation",range = "A2:B14") %>% 
+  janitor::clean_names() %>% 
+  mutate(year = 2018)
+
+prec_2019_df = 
+  read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+             sheet = "2019 Precipitation",range = "A2:B14") %>% 
+  janitor::clean_names() %>% 
+  mutate(year = 2019)
+
+prec_2018_2019_df = 
+  bind_rows(prec_2018_df,prec_2019_df) %>% 
+  mutate(month = month.name[month])
+
+```
+
+
+Let's take a look at the first and last 3 lines of `prec_2018_2019_df`.
+
+```{r}
+knitr::kable(head(prec_2018_2019_df,3))
+knitr::kable(tail(prec_2018_2019_df,3))
+```
+
+ 
+For `mtw_df` which is tidied from Mr. Trash Wheel sheet, there are ``r nrow(mtw_df)`` observations and ``r ncol(mtw_df)`` variables (including serial number of the dumpster `dumpster`). Other variables are ``r names(mtw_df)[-1]``.
+
+For `prec_2018_2019_df` which is combined from cleaned precipitation data for 2018 and 2019, there are there are ``r nrow(prec_2018_2019_df)`` observations and ``r ncol(prec_2018_2019_df)`` variables, inclusing ``r names(prec_2018_2019_df)``. We can calculate from this dataframe that the total precipitation in 2018 was ``r sum(pull(prec_2018_2019_df,total)[1:12])``, and the median number of sports balls in a dumpster in 2019 was ``r median(pull(prec_2018_2019_df,total)[13:24])``.
+ 
+
+ 
+ 
