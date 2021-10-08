@@ -1,0 +1,13 @@
+---
+title: "P8105 Homework 2"
+author: Mengfan Luo (ml4701)
+output: github_document
+---
+
+```{r, echo=FALSE,message=FALSE}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+### Problem 1
+
