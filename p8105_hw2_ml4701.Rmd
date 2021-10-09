@@ -76,6 +76,7 @@ Our goal is to merge these into a single data frame using year and month as keys
 ```{r,message=FALSE}
 pols_df = read_csv("data/fivethirtyeight_datasets/pols-month.csv") %>% 
   separate(mon,into = c("year","month","day"),sep = "-") %>% 
+  mutate(year = as.numeric(year)) %>% 
   mutate(month = as.numeric(month)) %>% 
   mutate(month = month.name[month]) %>% 
   pivot_longer(cols = starts_with("prez"),names_to = "president",
@@ -94,11 +95,11 @@ snp_df = read_csv("data/fivethirtyeight_datasets/snp.csv") %>%
   mutate(date = mdy(date)) %>% 
   separate(date,into = c("year","month","day"),sep = "-") %>% 
   select(-day) %>% 
+  mutate(year = as.numeric(year)) %>% 
+  mutate(year = ifelse(year > 2049,year -100,year)) %>% 
   arrange(year,month) %>% 
   mutate(month = as.numeric(month)) %>% 
   mutate(month = month.name[month])
 knitr::kable(head(snp_df))
 ```
-
-
 
