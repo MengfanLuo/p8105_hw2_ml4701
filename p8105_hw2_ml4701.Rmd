@@ -7,6 +7,7 @@ output: github_document
 ```{r, echo=FALSE,message=FALSE}
 library(tidyverse)
 library(readxl)
+library(lubridate)
 ```
 
 ### Problem 1
@@ -65,6 +66,39 @@ For `mtw_df` which is tidied from Mr. Trash Wheel sheet, there are ``r nrow(mtw_
 
 For `prec_2018_2019_df` which is combined from cleaned precipitation data for 2018 and 2019, there are there are ``r nrow(prec_2018_2019_df)`` observations and ``r ncol(prec_2018_2019_df)`` variables, inclusing ``r names(prec_2018_2019_df)``. We can calculate from this dataframe that the total precipitation in 2018 was ``r sum(pull(prec_2018_2019_df,total)[1:12])``, and the median number of sports balls in a dumpster in 2019 was ``r median(pull(prec_2018_2019_df,total)[13:24])``.
  
+ 
+### Problem 2
 
- 
- 
+Our goal is to merge these into a single data frame using year and month as keys across datasets.
+
+1. clean and tidy the data in pols-month.csv. First 6 lines of the dataframe will be shown. 
+
+```{r,message=FALSE}
+pols_df = read_csv("data/fivethirtyeight_datasets/pols-month.csv") %>% 
+  separate(mon,into = c("year","month","day"),sep = "-") %>% 
+  mutate(month = as.numeric(month)) %>% 
+  mutate(month = month.name[month]) %>% 
+  pivot_longer(cols = starts_with("prez"),names_to = "president",
+               names_prefix = "prez_",values_to = "prez_value") %>% 
+  filter(prez_value==1) %>% 
+  select(-day,-prez_value) 
+
+knitr::kable(head(pols_df))
+```
+
+
+2. clean, tidy and organize the data in snp.csv. First 6 lines of the dataframe will be shown. 
+
+```{r,message=FALSE}
+snp_df = read_csv("data/fivethirtyeight_datasets/snp.csv") %>% 
+  mutate(date = mdy(date)) %>% 
+  separate(date,into = c("year","month","day"),sep = "-") %>% 
+  select(-day) %>% 
+  arrange(year,month) %>% 
+  mutate(month = as.numeric(month)) %>% 
+  mutate(month = month.name[month])
+knitr::kable(head(snp_df))
+```
+
+
+
