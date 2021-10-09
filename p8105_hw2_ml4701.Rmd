@@ -103,3 +103,66 @@ snp_df = read_csv("data/fivethirtyeight_datasets/snp.csv") %>%
 knitr::kable(head(snp_df))
 ```
 
+
+
+3. tidy the unemployment data so that it can be merged with the previous datasets. First 6 lines of the dataframe will be shown. 
+
+
+```{r,message=FALSE}
+unemploy_df = read_csv("data/fivethirtyeight_datasets/unemployment.csv") 
+colnames(unemploy_df)=c("year","1","2","3","4","5","6","7","8","9","10","11","12")
+
+unemploy_df =
+  pivot_longer(unemploy_df,`1`:`12`,
+               names_to = "month",values_to = "unemploy_percent") %>% 
+  mutate(month = as.numeric(month)) %>% 
+  mutate(month = month.name[month])
+knitr::kable(head(unemploy_df))
+```
+
+
+
+4. Join the datasets by merging snp into pols, and merging unemployment into the result. First and last 6 rows of the resulted dataframe `merge3_df` are shown below.
+
+```{r}
+merge2_df = left_join(pols_df,snp_df,by = c("year","month"))
+merge3_df = left_join(merge2_df,unemploy_df,by = c("year","month"))
+knitr::kable(head(merge3_df))
+knitr::kable(tail(merge3_df))
+```
+
+
+In this problem, 3 dataframe was tidied and merged together.
+
+Dataframe 1 `pols_df` has ``r nrow(pols_df)`` rows and ``r ncol(pols_df)`` columns. The variables in the dataframe are ``r names(pols_df)``.
+
+Dataframe 2 `snp_df` has ``r nrow(snp_df)`` rows and ``r ncol(snp_df)`` columns. The variables in the dataframe are ``r names(snp_df)``.
+
+Dataframe 3 `unemploy_df` has ``r nrow(unemploy_df)`` rows and ``r ncol(unemploy_df)`` columns. The variables in the dataframe are ``r names(unemploy_df)``.
+
+The resulting dataset `merge3_df` is merged by the three above dataset according to the same year and month. It has ``r nrow(merge3_df)`` rows and ``r ncol(merge3_df)`` columns. The variables in the dataframe are ``r names(merge3_df)``. The range of years of the merged table is 
+``r range(pull(merge3_df,year))[2]-range(pull(merge3_df,year))[1]`` years,from ``r range(pull(merge3_df,year))[1]`` to ``r range(pull(merge3_df,year))[2]``.
+
+
+### Problem 3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+
+
