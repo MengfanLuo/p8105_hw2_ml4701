@@ -69,7 +69,7 @@ For `prec_2018_2019_df` which is combined from cleaned precipitation data for 20
  
 ### Problem 2
 
-1. clean and tidy the data in pols-month.csv. First 6 lines of the dataframe will be shown. 
+1. Clean and tidy the data in pols-month.csv. First 6 lines of the dataframe will be shown. 
 
 ```{r,message=FALSE}
 pols_df = read_csv("data/fivethirtyeight_datasets/pols-month.csv") %>% 
@@ -86,7 +86,7 @@ knitr::kable(head(pols_df))
 ```
 
 
-2. clean, tidy and organize the data in snp.csv. First 6 lines of the dataframe will be shown. 
+2. Clean, tidy and organize the data in snp.csv. First 6 lines of the dataframe will be shown. 
 
 ```{r,message=FALSE}
 snp_df = read_csv("data/fivethirtyeight_datasets/snp.csv") %>% 
@@ -103,7 +103,7 @@ knitr::kable(head(snp_df))
 
 
 
-3. tidy the unemployment data so that it can be merged with the previous datasets. First 6 lines of the dataframe will be shown. 
+3. Tidy the unemployment data so that it can be merged with the previous datasets. First 6 lines of the dataframe will be shown. 
 
 
 ```{r,message=FALSE}
@@ -210,8 +210,7 @@ knitr::kable(olivia_df)
 The following table shows **the most popular name among male children over year 2011-2016 for different ethnicities**.
 
 ```{r}
-male_df = filter(babyname_df,gender == "MALE") %>% 
-  filter(rank == 1) %>% 
+male_df = filter(babyname_df,gender == "MALE",rank == 1) %>% 
   arrange(year_of_birth) %>% 
   select(-gender,-count,-rank) %>% 
   pivot_wider(names_from = "year_of_birth",values_from = "childs_first_name")
@@ -219,9 +218,19 @@ knitr::kable(male_df)
 ```
 
 
-Finally, for male, white non-hispanic children born in 2016, produce a scatter plot showing the number of children with a name (y axis) against the rank in popularity of that name (x axis).
+Scatter plot showing the number of children with a name against the rank in popularity of that name, for male, white non-hispanic children born in 2016 are shown as belowed:
 
 
+```{r}
+male2016_df = filter(babyname_df,gender == "MALE",
+                     ethnicity == "WHITE NON HISPANIC",year_of_birth == 2016) %>%
+  select(childs_first_name,count,rank)
+ggplot(male2016_df,aes(x = rank, y = count))+ geom_point()+
+  labs(title = "Scatter plot of the number of children with a name against the rank of the name" ,
+  subtitle = "White non-hispanic children born in 2016",
+  x = "Rank in popularity of the name",
+  y = "Number of children with the name")
+```
 
 
 
