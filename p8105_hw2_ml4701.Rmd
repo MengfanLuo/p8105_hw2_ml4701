@@ -69,8 +69,6 @@ For `prec_2018_2019_df` which is combined from cleaned precipitation data for 20
  
 ### Problem 2
 
-Our goal is to merge these into a single data frame using year and month as keys across datasets.
-
 1. clean and tidy the data in pols-month.csv. First 6 lines of the dataframe will be shown. 
 
 ```{r,message=FALSE}
@@ -121,7 +119,6 @@ knitr::kable(head(unemploy_df))
 ```
 
 
-
 4. Join the datasets by merging snp into pols, and merging unemployment into the result. First and last 6 rows of the resulted dataframe `merge3_df` are shown below.
 
 ```{r}
@@ -146,8 +143,83 @@ The resulting dataset `merge3_df` is merged by the three above dataset according
 
 ### Problem 3
 
+Load dataset as `babyname_df` and clean column names
+
+```{r}
+babyname_df = read_csv("data/Popular_Baby_Names.csv") %>% 
+  janitor::clean_names()
+
+```
+
+Looking into the values of the dataset, we found the ethnicity may have some inconsistent value imput. For example, `BLACK NON HISPANIC` and `BLACK NON HISP` obviously stand for the same ethnicity, while have two different imput value.
+
+```{r}
+unique(pull(babyname_df,ethnicity))
+```
+
+Here we try to make the values for `ethnicity` consistent.
+
+```{r}
+ethnicity_list = pull(babyname_df,ethnicity)
+n = length(ethnicity_list)
 
 
+for (i in 1:n ){
+  if (ethnicity_list[i] == "ASIAN AND PACI") {
+    ethnicity_list[i] = "ASIAN AND PACIFIC ISLANDER"
+  }else if (ethnicity_list[i] == "BLACK NON HISP") {
+    ethnicity_list[i] = "BLACK NON HISPANIC"
+  }else if (ethnicity_list[i] == "WHITE NON HISP") {
+    ethnicity_list[i] = "WHITE NON HISPANIC"
+  }
+}
+  
+babyname_df = mutate(babyname_df,ethnicity = ethnicity_list)
+
+unique(pull(babyname_df,ethnicity))
+```
+
+Also the `childs_first_name` are inconsistent in terms of cases. We make it consistent with an upper case first letter and lower case for the rest letters in one name.
+
+```{r}
+
+babyname_df = 
+  mutate(babyname_df,childs_first_name = str_to_lower(childs_first_name))%>%
+  mutate(childs_first_name = Hmisc::capitalize(childs_first_name))  
+  
+```
+
+Now, we have made the values in columns consistent. We then remove the duplicate rows.
+
+```{r}
+babyname_df = distinct(babyname_df)
+```
+
+``r n-nrow(babyname_df)`` duplicated rows are removed
+ 
+The following table shows **the rank in popularity of the name “Olivia” as a female baby name over year 2013-2016 for different ethnicities**.
+
+```{r}
+olivia_df = filter(babyname_df,childs_first_name == "Olivia") %>% 
+  arrange(year_of_birth) %>% 
+  select(-gender,-count,-childs_first_name) %>% 
+  pivot_wider(names_from = "year_of_birth",values_from = "rank")
+knitr::kable(olivia_df)
+```
+
+The following table shows **the most popular name among male children over year 2011-2016 for different ethnicities**.
+
+```{r}
+male_df = filter(babyname_df,gender == "MALE") %>% 
+  filter(rank == 1) %>% 
+  arrange(year_of_birth) %>% 
+  select(-gender,-count,-rank) %>% 
+  pivot_wider(names_from = "year_of_birth",values_from = "childs_first_name")
+knitr::kable(male_df)
+```
+
+
+Finally, for male, white non-hispanic children born in 2016, produce a scatter plot showing the number of children with a name (y axis) against the rank in popularity of that name (x axis).
 
 
 
